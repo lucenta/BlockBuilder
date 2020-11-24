@@ -244,8 +244,8 @@ class World(object):
     #         The queue contains calls to _showBlock() and _hideBlock() so this method should be called if
     #         addBlock() or removeBlock() was called with immediate=False
     def process_queue(self):
-        start = time.clock()
-        while self.queue and time.clock() - start < 1.0 / Constants.TICKS_PER_SEC:
+        start = time.process_time()
+        while self.queue and time.process_time() - start < 1.0 / Constants.TICKS_PER_SEC:
             self._dequeue()
 
     ## @brief Process the entire queue while taking no periodic breaks.
