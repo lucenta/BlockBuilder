@@ -214,16 +214,16 @@ class World(object):
         afterSet = set()
         pad = 4
         for dx in range(-pad, pad + 1):
-            for dy in [0]:                  # range(-pad, pad + 1):
-                for dz in range(-pad, pad + 1):
-                    if dx ** 2 + dy ** 2 + dz ** 2 > (pad + 1) ** 2:
-                        continue
-                    if before:
-                        x, y, z = before
-                        beforeSet.add((x + dx, y + dy, z + dz))
-                    if after:
-                        x, y, z = after
-                        afterSet.add((x + dx, y + dy, z + dz))
+            dy = 0
+            for dz in range(-pad, pad + 1):
+                if dx ** 2 + dy ** 2 + dz ** 2 > (pad + 1) ** 2:
+                    continue
+                if before:
+                    x, y, z = before
+                    beforeSet.add((x + dx, y + dy, z + dz))
+                if after:
+                    x, y, z = after
+                    afterSet.add((x + dx, y + dy, z + dz))
         show = afterSet - beforeSet
         hide = beforeSet - afterSet
         for sector in show:
