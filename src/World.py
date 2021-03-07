@@ -17,6 +17,7 @@ from pyglet.graphics import TextureGroup
 from collections import deque
 import random
 import time
+import socket
 
 ## @brief An abstract object representing the world state of BlockBuilder
 class World(object):
@@ -30,7 +31,21 @@ class World(object):
         self.sectors = {}               # Mapping from sector to a list of positions inside that sector.
         self.queue = deque()            # Create queue to manage function calls to keep game running smooth. The queue is populated with_showBlock() and _hideBlock() calls.
                                         # self.queue is not a necessary feature but helps to improve game performance.
+        
+        print("Connecting to Server")
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.connect(('localhost', 9000))
+        # data = s.recv(1024)
+        # s.close()
+        # print 'Received', repr(data)
+
         self.GenerateWorld(initialPos)
+
+
+        
+        
+        
+
 
     ## @brief Creates the initial world state of the game (Generates random landforms).
     def GenerateWorld(self, initialPos):
@@ -79,6 +94,8 @@ class World(object):
     # @return The coordinates of the block currently being looked at, as well as
     #          the last block in the line of sight, otherwise none if no block is
     #          being looked at.
+
+
     def hitTest(self, pos, vec, distance):
         m = Constants.MAX_DISTANCE
         x, y, z = pos
@@ -115,8 +132,11 @@ class World(object):
             invalidBlocks.append((x,y-i,z))
 
         if position not in invalidBlocks:
+            print(position)
+            # Removes block if it wasn't delete from a position for some reason before overwriting
             if position in self.blockSet:
                 self.removeBlock(position, immediate)
+            self.s.sendall(str(position).encode())
             self.blockSet[position] = texture
             self.sectors.setdefault(sectorize(position), []).append(position)
             if immediate:
