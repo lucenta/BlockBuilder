@@ -18,6 +18,8 @@ from collections import deque
 import random
 import time
 import socket
+import threading
+import json
 
 ## @brief An abstract object representing the world state of BlockBuilder
 class World(object):
@@ -32,19 +34,24 @@ class World(object):
         self.queue = deque()            # Create queue to manage function calls to keep game running smooth. The queue is populated with_showBlock() and _hideBlock() calls.
                                         # self.queue is not a necessary feature but helps to improve game performance.
         
-        print("Connecting to Server")
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect(('localhost', 9000))
-        # data = s.recv(1024)
-        # s.close()
-        # print 'Received', repr(data)
-
+        self.s = None
         self.GenerateWorld(initialPos)
 
+        print("Connecting to Server")
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.connect(('localhost', 9001))
+        a = threading.Thread(target=self.addBlock_handler) # Create thread to handle adding blocks server
+        a.start()
 
         
         
-        
+    # Recieves an "add block msg" from server
+    def addBlock_handler(self):
+        while True:
+            msg = self.s.recv(1024).decode('utf-8')
+            print("ADD",msg,"FROM SERVER")
+            self.__addBlock(eval(msg))
+        self.s.close()
 
 
     ## @brief Creates the initial world state of the game (Generates random landforms).
@@ -132,20 +139,37 @@ class World(object):
             invalidBlocks.append((x,y-i,z))
 
         if position not in invalidBlocks:
-            print(position)
             # Removes block if it wasn't delete from a position for some reason before overwriting
             if position in self.blockSet:
                 self.removeBlock(position, immediate)
-            self.s.sendall(str(position).encode())
+
+            # Send to server
+            # block = {'T':texture,'P':position}
+            if self.s:
+                msg = str(position).encode('utf-8')
+                self.s.sendall(msg)
+
             self.blockSet[position] = texture
             self.sectors.setdefault(sectorize(position), []).append(position)
             if immediate:
                 if self.exposed(position):
                     self.showBlock(position)
                 self.checkSurrounding(position)
+
         else:       # Do nothing if the spot that will be occupied by the block is occupied by the player
             return
 
+    # Adds a grass block at given position. Just a temporary test function
+    def __addBlock(self,position,immediate=True):
+        # self.blockSet[position] = texture
+        if position in self.blockSet:
+            self.removeBlock(position, immediate)
+        self.blockSet[position] = GRASS
+        self.sectors.setdefault(sectorize(position), []).append(position)
+        if immediate:
+            if self.exposed(position):
+                self.showBlock(position)
+            self.checkSurrounding(position)
     ## @brief Method to remove a block with a given position in the world by removing it in
     #         the self.blockSet dictionary.
     # @param position The (x, y, z) position of the block to remove (tuple of len 3)
