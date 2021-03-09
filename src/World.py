@@ -20,6 +20,7 @@ import time
 import socket
 import threading
 import json
+import protocols as p
 
 ## @brief An abstract object representing the world state of BlockBuilder
 class World(object):
@@ -39,18 +40,17 @@ class World(object):
 
         print("Connecting to Server")
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect(('localhost', 9001))
+        self.s.connect(('localhost', 9000))
         a = threading.Thread(target=self.addBlock_handler) # Create thread to handle adding blocks server
         a.start()
 
         
-        
     # Recieves an "add block msg" from server
     def addBlock_handler(self):
         while True:
-            msg = self.s.recv(1024).decode('utf-8')
-            print("ADD",msg,"FROM SERVER")
-            self.__addBlock(eval(msg))
+            msg = p.recv_action(self.s)
+            print(msg)
+            # self.__addBlock(eval(msg))
         self.s.close()
 
 
@@ -144,10 +144,10 @@ class World(object):
                 self.removeBlock(position, immediate)
 
             # Send to server
-            # block = {'T':texture,'P':position}
             if self.s:
-                msg = str(position).encode('utf-8')
-                self.s.sendall(msg)
+                # self.s.sendall(str(position).encode('utf-8'))
+                block = {'T':texture,'P':position}
+                p.send_action(block,self.s)
 
             self.blockSet[position] = texture
             self.sectors.setdefault(sectorize(position), []).append(position)

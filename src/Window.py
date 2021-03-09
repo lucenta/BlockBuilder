@@ -1,9 +1,3 @@
-## @file Window.py
-#  @author Andrew Lucentini, Christopher DiBussolo
-#  @brief Implements the window visible to the user and game mechanics of BlockBuilder.
-#         This code follows the PEP 8 Coding Style
-#  @date 12/4/2018
-
 # BlockBuilder imports
 import Constants
 from World import *
