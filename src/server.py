@@ -35,7 +35,6 @@ def addBlock_handler(c,addr):
 	while True:
 		# msg = c.recv(1024).decode('utf-8')
 		action = p.recv_action(c)
-		print(action)
 		if not action:
 			break
 		# print(msg)

@@ -149,7 +149,6 @@ class World(object):
             if self.s:
                 # self.s.sendall(str(position).encode('utf-8'))
                 action = {'T':texture,'P':position}
-                print(action)
                 p.send_action(action,self.s)
 
             self.blockSet[position] = ALL_BLOCKS[texture]
@@ -181,9 +180,10 @@ class World(object):
     #                  is not provided)
     def removeBlock(self, position, immediate=True):
         del self.blockSet[position]
-        action = {'P':position}
-        p.send_action(action,self.s)
-        
+        if self.s:
+            action = {'P':position}
+            p.send_action(action,self.s)
+
         self.sectors[sectorize(position)].remove(position)
         if immediate:
             if position in self.shownBlocks:
@@ -191,7 +191,7 @@ class World(object):
             self.checkSurrounding(position)
 
 
-    def _removeBlock(self, position, immediate=True):
+    def __removeBlock(self, position, immediate=True):
         position = tuple(position)
         del self.blockSet[position]
         self.sectors[sectorize(position)].remove(position)
