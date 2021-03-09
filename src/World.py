@@ -41,12 +41,12 @@ class World(object):
         print("Connecting to Server")
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect(('localhost', 9000))
-        a = threading.Thread(target=self.addBlock_handler) # Create thread to handle adding blocks server
+        a = threading.Thread(target=self.action_handler) # Create thread to handle adding blocks server
         a.start()
 
         
-    # Recieves an "add block msg" from server
-    def addBlock_handler(self):
+    # Seperate thread to get actions from other users on the network
+    def action_handler(self):
         while True:
             action = p.recv_action(self.s)
             if 'T' in action:
