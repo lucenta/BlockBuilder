@@ -51,4 +51,4 @@ BRICK = allFacesCoordinates((2, 0), (2, 0), (2, 0))
 STONE = allFacesCoordinates((2, 1), (2, 1), (2, 1))
 DIRT = allFacesCoordinates((0, 1), (0, 1), (0, 1))
 
-
+ALL_BLOCKS = {"GRASS":GRASS,"SAND":SAND,"BRICK":BRICK,"STONE":STONE,"DIRT":DIRT}

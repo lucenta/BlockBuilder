@@ -17,19 +17,18 @@ class Window(pyglet.window.Window):
         self.flying = False         # When flying gravity has no effect and speed is increased.
         self.strafe = [0, 0]        # First element is -1 when moving forward, 1 when moving back, and 0
                                     # otherwise. The second element is -1 when moving left, 1 when moving
-                                    # right, and 0 otherwise.    
+                                    # right, and 0 otherwise.
         self.position = (0, 0, 0)   # Current (x, y, z) position in the world
         self.rotation = (0, 0)      # Determines degrees of rotation with respect to the ground
         self.sector = None          # Which sector the player is currently in.
         self.reticle = None         # The crosshairs at the center of the screen.
         self.dy = 0                 # Velocity in the y (upward) direction.
-        self.inventory = [GRASS, BRICK, SAND, STONE] # A list of blocks the player can place
-        self.block = self.inventory[0]               # The current block that the user can place
 
-        self.num_keys = [                            # Convenience list of num keys.
-            key._1, key._2, key._3, key._4, key._5,
-            key._6, key._7, key._8, key._9, key._0]
+        self.inventory = ALL_BLOCKS # A dictionary of items that the user has. Just set it equal to all_blocks for now
+        self.block = "GRASS"
 
+        self.num_keys = {key._1:"GRASS",key._2:"DIRT",key._3:"SAND",key._4:"BRICK",key._5:"STONE"} # Bind num keys to items
+        
         self.World = World(self.position)                                    # Instance of the World
 
         self.label = pyglet.text.Label('', font_name='Arial', font_size=18,  # The label that is displayed in the top left of the canvas.
@@ -154,7 +153,7 @@ class Window(pyglet.window.Window):
             block, previous = self.World.hitTest(self.position, vector, Constants.MAX_DISTANCE)
             if (button == mouse.RIGHT):
                 if previous:
-                    self.World.addBlock(previous,self.position,self.block )
+                    self.World.addBlock(previous,self.position,self.block)
             elif button == mouse.LEFT and block:
                 texture = self.World.blockSet[block]
                 if texture != STONE:
@@ -196,8 +195,8 @@ class Window(pyglet.window.Window):
         elif symbol == key.TAB:
             self.flying = not self.flying
         elif symbol in self.num_keys:
-            index = (symbol - self.num_keys[0]) % len(self.inventory)
-            self.block = self.inventory[index]
+            block_name = self.num_keys[symbol]
+            self.block = block_name
 
     ## @brief Method inherited by pyglet Window object to determine what occurs when keys are released.
     # @param symbol The key that is released

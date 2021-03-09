@@ -6,12 +6,14 @@ import protocols as p
 CLIENTS = {} # Maintain dict of clients. Each client has a queue, and a lock.
 lock = threading.Lock()
 
-# Broadcast an action to all clients
-def broadcast(action):
+# Broadcast an action to all clients except for the one who sent it
+def broadcast(action,c,addr):
 	# Since the number of CLIENTS can be modified, we must lock the resource incase we delete one while iterating
+	ID = (c,addr)
 	lock.acquire()
 	for q in CLIENTS:
-		CLIENTS[q].append(action)
+		if q != ID:
+			CLIENTS[q].append(action)
 	lock.release()
 
 # Function (Thread) to process the queue for a user
@@ -37,7 +39,7 @@ def addBlock_handler(c,addr):
 			break
 		# print(msg)
 		# print(msg,"from",addr)
-		broadcast(action) # Add new block placement to client queues
+		broadcast(action,c,addr) # Add new block placement to client queues
 	disconnect_client(c,addr)
 
 

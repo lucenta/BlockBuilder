@@ -48,9 +48,8 @@ class World(object):
     # Recieves an "add block msg" from server
     def addBlock_handler(self):
         while True:
-            msg = p.recv_action(self.s)
-            print(msg)
-            # self.__addBlock(eval(msg))
+            action = p.recv_action(self.s)
+            self.__addBlock(action['P'],action['T'])
         self.s.close()
 
 
@@ -61,36 +60,37 @@ class World(object):
         y=0
         for x in range(-size, size + 1):    # Create a layer grass, dirt, then stone everywhere.
             for z in range(-size, size + 1):   
-                self.addBlock((x, y - 2, z),initialPos, GRASS, immediate=False)
+                self.addBlock((x, y - 2, z),initialPos, "GRASS", immediate=False)
                 for i in range(3,7):
-                    self.addBlock((x, y - i, z),initialPos, DIRT, immediate=False)
-                self.addBlock((x, y - 6, z),initialPos, STONE, immediate=False)
+                    self.addBlock((x, y - i, z),initialPos, "DIRT", immediate=False)
+                self.addBlock((x, y - 6, z),initialPos, "STONE", immediate=False)
 
+        tex = "STONE"
         for j in range(-size, size):       # Create boundary walls
             for i in range(1, 10):
-                self.addBlock((-size, -6 + i, j+1),initialPos, STONE, immediate=False)
-                self.addBlock((size, -6 + i, j+1),initialPos, STONE, immediate=False)
-                self.addBlock((j+1, -6 + i, size),initialPos, STONE, immediate=False)
-                self.addBlock((j+1, -6 + i, -size),initialPos, STONE, immediate=False)
+                self.addBlock((-size, -6 + i, j+1),initialPos, tex, immediate=False)
+                self.addBlock((size, -6 + i, j+1),initialPos, tex, immediate=False)
+                self.addBlock((j+1, -6 + i, size),initialPos, tex, immediate=False)
+                self.addBlock((j+1, -6 + i, -size),initialPos, tex, immediate=False)
 
-        Hsize = size -20                       # Generating hills using random values
-        for i in range(100):
-            Hx = random.randint(-Hsize, Hsize) # Initial x position for the hill
-            Hz = random.randint(-Hsize, Hsize) # Initial z position for the hill
-            Hy = -1                            # Initial y position for hill, start each at base of plane
-            h = random.randint(3,10)           # Choose a height for the hills
-            Hside = random.randint(3, 6)
-            tex = random.choice([GRASS, SAND])
-            for y in range(Hy, Hy + h):
-                for x in range(Hx - Hside, Hx + Hside + 1):
-                    for z in range(Hz - Hside, Hz + Hside + 1):
-                        if ((x - Hx) ** 2 + (z - Hz)**2 > (Hside + 1)**2):
-                            pass
-                        elif ((x - 0)**2 + (z-0)**2 < 5**2):
-                            pass
-                        else:
-                            self.addBlock((x,y,z),initialPos, tex, immediate = False)
-                Hside -= 1
+        # Hsize = size -20                       # Generating hills using random values
+        # for i in range(100):
+        #     Hx = random.randint(-Hsize, Hsize) # Initial x position for the hill
+        #     Hz = random.randint(-Hsize, Hsize) # Initial z position for the hill
+        #     Hy = -1                            # Initial y position for hill, start each at base of plane
+        #     h = random.randint(3,10)           # Choose a height for the hills
+        #     Hside = random.randint(3, 6)
+        #     tex = random.choice(["GRASS", "SAND"])
+        #     for y in range(Hy, Hy + h):
+        #         for x in range(Hx - Hside, Hx + Hside + 1):
+        #             for z in range(Hz - Hside, Hz + Hside + 1):
+        #                 if ((x - Hx) ** 2 + (z - Hz)**2 > (Hside + 1)**2):
+        #                     pass
+        #                 elif ((x - 0)**2 + (z-0)**2 < 5**2):
+        #                     pass
+        #                 else:
+        #                     self.addBlock((x,y,z),initialPos, tex, immediate = False)
+        #         Hside -= 1
 
     ## @brief Check which block is in the players line of sight.
     # @param pos The (x, y, z) position of player camera (tuple of len 3)
@@ -146,10 +146,10 @@ class World(object):
             # Send to server
             if self.s:
                 # self.s.sendall(str(position).encode('utf-8'))
-                block = {'T':texture,'P':position}
-                p.send_action(block,self.s)
+                action = {'T':texture,'P':position}
+                p.send_action(action,self.s)
 
-            self.blockSet[position] = texture
+            self.blockSet[position] = ALL_BLOCKS[texture]
             self.sectors.setdefault(sectorize(position), []).append(position)
             if immediate:
                 if self.exposed(position):
@@ -160,11 +160,11 @@ class World(object):
             return
 
     # Adds a grass block at given position. Just a temporary test function
-    def __addBlock(self,position,immediate=True):
+    def __addBlock(self,position,texture,immediate=True):
         # self.blockSet[position] = texture
         if position in self.blockSet:
             self.removeBlock(position, immediate)
-        self.blockSet[position] = GRASS
+        self.blockSet[position] = ALL_BLOCKS[texture]
         self.sectors.setdefault(sectorize(position), []).append(position)
         if immediate:
             if self.exposed(position):
