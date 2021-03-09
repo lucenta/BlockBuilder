@@ -49,7 +49,10 @@ class World(object):
     def addBlock_handler(self):
         while True:
             action = p.recv_action(self.s)
-            self.__addBlock(action['P'],action['T'])
+            if 'T' in action:
+                self.__addBlock(action['P'],action['T'])
+            else:
+                self.__removeBlock(action['P'])
         self.s.close()
 
 
@@ -178,11 +181,26 @@ class World(object):
     #                  is not provided)
     def removeBlock(self, position, immediate=True):
         del self.blockSet[position]
+        action = {'P':position}
+        p.send_action(action,self.s)
+        
         self.sectors[sectorize(position)].remove(position)
         if immediate:
             if position in self.shownBlocks:
                 self.hideBlock(position)
             self.checkSurrounding(position)
+
+
+    def _removeBlock(self, position, immediate=True):
+        position = tuple(position)
+        del self.blockSet[position]
+        self.sectors[sectorize(position)].remove(position)
+        if immediate:
+            if position in self.shownBlocks:
+                self.hideBlock(position)
+            self.checkSurrounding(position)
+    
+
 
     ## @brief Show the block given at position if it is exposed.
     # @param position The (x, y, z) position of the block to show.
