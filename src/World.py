@@ -137,7 +137,6 @@ class World(object):
         invalidBlocks = [(x,y,z)]
         for i in range(1,Constants.PLAYER_HEIGHT):
             invalidBlocks.append((x,y-i,z))
-
         if position not in invalidBlocks:
             # Removes block if it wasn't delete from a position for some reason before overwriting
             if position in self.blockSet:
@@ -147,6 +146,7 @@ class World(object):
             if self.s:
                 # self.s.sendall(str(position).encode('utf-8'))
                 action = {'T':texture,'P':position}
+                print(action)
                 p.send_action(action,self.s)
 
             self.blockSet[position] = ALL_BLOCKS[texture]
@@ -162,6 +162,7 @@ class World(object):
     # Adds a grass block at given position. Just a temporary test function
     def __addBlock(self,position,texture,immediate=True):
         # self.blockSet[position] = texture
+        position = tuple(position)
         if position in self.blockSet:
             self.removeBlock(position, immediate)
         self.blockSet[position] = ALL_BLOCKS[texture]
