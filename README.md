@@ -18,4 +18,10 @@ To start your own server:
 python3 server.py <port>
 ```
 
+HOW TO PLAY:
+W,S,A,D - Move Player
+Tab - Enter/Exit flying mode
+Left Click - Remove Block
+Right Click - Place Block
+Keys 1-5 - Select Block Type (Note that Stone blocks can't be destroyed)
 
