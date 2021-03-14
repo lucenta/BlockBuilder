@@ -19,12 +19,11 @@ python3 server.py <port>
 ```
 
 HOW TO PLAY:
-W,S,A,D - Move Player
-Tab - Enter/Exit flying mode
-Left Click - Remove Block
-Right Click - Place Block
-Keys 1-5 - Select Block Type (Note that Stone blocks can't be destroyed)
-
-| Parameter | Description | Default |
-| --------- | ----------- | ------- |
-| `global.imagePullSecrets` | Reference to one or more secrets to be used when pulling images | `[]` |
+| Keystroke | Description 
+| --------- | ----------- |
+| W,S,A,D | Move Player |
+| Space-bar | Jump |
+| Tab | Enter/exit flying mode |
+| Left-Click | Remove block | 
+| Right-Click | Place block |
+| Keys 1-5 | Change block type (note that stone blocks can't be destroyed) |
