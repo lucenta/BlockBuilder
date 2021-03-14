@@ -69,7 +69,7 @@ def main():
 		return
 	s = socket.socket()
 	host = '0.0.0.0'
-	port = 9000
+	port = int(sys.argv[1])
 	print("Started, waiting for clients...")
 	s.bind((host,port))
 	s.listen(5)
