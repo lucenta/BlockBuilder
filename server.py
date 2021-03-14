@@ -31,7 +31,7 @@ def process_queue(c,addr):
 
 
 # Function (Thread) to handle when client sends action to server
-def addBlock_handler(c,addr):
+def client_handler(c,addr):
 	print("Client joined with",addr)
 	while True:
 		action = p.recv_action(c)
@@ -76,8 +76,8 @@ def main():
 
 	while True:
 		c, addr = s.accept()
-		CLIENTS[(c,addr)] = [] # Add a queue and lock for the client
-		a = threading.Thread(target=addBlock_handler, args=(c,addr)) # Create thread to handle adding block from client
+		CLIENTS[(c,addr)] = [] # Add a queue for the client
+		a = threading.Thread(target=client_handler, args=(c,addr)) # Create thread to handle recieving actions from client
 		p = threading.Thread(target=process_queue, args=(c,addr))	# Create a thread to process the queue for a client
 		a.start()
 		p.start()
