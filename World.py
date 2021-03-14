@@ -38,11 +38,11 @@ class World(object):
         self.s = None
         self.GenerateWorld(initialPos)
 
-        print("Connecting to Server")
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect(('localhost', 9000))
-        a = threading.Thread(target=self.action_handler) # Create thread to handle adding blocks server
-        a.start()
+        # print("Connecting to Server")
+        # self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # self.s.connect(('localhost', 9000))
+        # a = threading.Thread(target=self.action_handler) # Create thread to handle adding blocks server
+        # a.start()
 
         
     # Seperate thread to get actions from other users on the network

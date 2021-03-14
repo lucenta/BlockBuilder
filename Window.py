@@ -11,7 +11,12 @@ import math
 ## @brief Inherited window object from pyglet library. Creates the window that displays BlockBuilder as well as defines game mechanics
 class Window(pyglet.window.Window):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, server=None, *args, **kwargs):
+        if server:
+            self.s = server
+            # If a multiplayer game was started, connect to server
+            print("connecting to server",self.s)
+
         super().__init__(*args, **kwargs)
         self.exclusive = True       # Whether or not the window exclusively captures the mouse.
         self.flying = False         # When flying gravity has no effect and speed is increased.

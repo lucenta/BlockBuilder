@@ -12,12 +12,16 @@ def main():
     # Check command line args and start a game accordingly
     game = sys.argv[1]
     if game == '-s': # Single player game
-        print("start single player game")
+        print("Starting single player game...")
+        window = Window(width=1300, height=700, caption='BlockBuilder', resizable=True) #Create Window
     elif game == "-m": # Join a server
         if n != 4:
             print("Please specify port ip and port number")
             return 
-        print("start multiplayer game")
+        print("Starting multiplayer game...")
+        ip = sys.argv[2]
+        port = sys.argv[3]
+        window = Window(server =(ip,port), width=1300, height=700, caption='BlockBuilder', resizable=True) #Create Window
     elif game == "-c": # Create a server
         if n != 3:
             print("Please specify port num")
@@ -27,7 +31,7 @@ def main():
         print(err_msg())
         return
     # window = Window(width=1300, height=700, caption='BlockBuilder', resizable=True) #Create Window
-    # window.set_exclusive_mouse(True)                    # Hide the mouse cursor
+    window.set_exclusive_mouse(True)                    # Hide the mouse cursor
 
     # glClearColor(0.5, 0.7, 1.0, 1)                      # Set the sky color
 
@@ -43,7 +47,7 @@ def main():
     # glFogf(GL_FOG_START, 20.0)
     # glFogf(GL_FOG_END, 60.0)
 
-    # pyglet.app.run()                                    # Start PyGlet app
+    pyglet.app.run()                                    # Start PyGlet app
 
 def err_msg():
     return("Invalid Usage...\n"+
