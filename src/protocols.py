@@ -2,7 +2,8 @@ import socket
 import json
 
 '''
-This file contains the protocol used to send and receive actions.
+This file contains the protocol used to send and receive actions. 
+Each message is delimited by the DELIMITER
 '''
 DELIMITER = b'$'
 
