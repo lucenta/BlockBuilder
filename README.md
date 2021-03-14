@@ -25,3 +25,6 @@ Left Click - Remove Block
 Right Click - Place Block
 Keys 1-5 - Select Block Type (Note that Stone blocks can't be destroyed)
 
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| `global.imagePullSecrets` | Reference to one or more secrets to be used when pulling images | `[]` |
