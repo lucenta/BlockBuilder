@@ -2,8 +2,9 @@ import socket
 import threading
 import json
 import protocols as p
+import sys
 
-CLIENTS = {} # Maintain dict of clients. Each client has a queue, and a lock.
+CLIENTS = {} # Maintain dict of clients. Each client has a queue of actions to process
 lock = threading.Lock()
 
 # Broadcast an action to all clients except for the one who sent it
@@ -33,13 +34,10 @@ def process_queue(c,addr):
 def addBlock_handler(c,addr):
 	print("Client joined with",addr)
 	while True:
-		# msg = c.recv(1024).decode('utf-8')
 		action = p.recv_action(c)
 		if not action:
 			break
-		# print(msg)
-		# print(msg,"from",addr)
-		broadcast(action,c,addr) # Add new block placement to client queues
+		broadcast(action,c,addr) # Broadcast action message to all connected clients
 	disconnect_client(c,addr)
 
 
@@ -51,6 +49,8 @@ def disconnect_client(c,addr):
 	lock.release()
 	c.close()
 
+def validPort(port):
+	return port.isdigit() and (1 <= int(port) <= 65535)
 '''
 Two threads are created for each client that connects. One thread handles the actions that the client sends to the server
 (i.e. adding or removing a block). When a user performs an action, the action is sent to the queue associated with that client
@@ -59,6 +59,14 @@ The second thread processes the queue.
 This functionality is chosen to ensure that things run smooothly and we don't block our receives with sends, or vice versa.
 '''
 def main():
+	# Ensure there is a port argument and validate it
+	if len(sys.argv) != 2:
+		print("Invalid Usage...")
+		print("\tpython3 server.py <port>")
+		return
+	if not validPort(sys.argv[1]):
+		print("Invalid port number")
+		return
 	s = socket.socket()
 	host = '0.0.0.0'
 	port = 9000
@@ -75,4 +83,5 @@ def main():
 		p.start()
 	s.close()
 
-main()
+if __name__ == '__main__':
+    main()

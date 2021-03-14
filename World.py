@@ -19,11 +19,10 @@ import random
 import time
 import socket
 import threading
-import json
 import protocols as p
 
 ## @brief An abstract object representing the world state of BlockBuilder
-class World(object):
+class World():
 
     def __init__(self, initialPos):
         self.batch = pyglet.graphics.Batch() # A collection of vertex lists for batched rendering.
@@ -34,27 +33,7 @@ class World(object):
         self.sectors = {}               # Mapping from sector to a list of positions inside that sector.
         self.queue = deque()            # Create queue to manage function calls to keep game running smooth. The queue is populated with_showBlock() and _hideBlock() calls.
                                         # self.queue is not a necessary feature but helps to improve game performance.
-        
-        self.s = None
         self.GenerateWorld(initialPos)
-
-        # print("Connecting to Server")
-        # self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # self.s.connect(('localhost', 9000))
-        # a = threading.Thread(target=self.action_handler) # Create thread to handle adding blocks server
-        # a.start()
-
-        
-    # Seperate thread to get actions from other users on the network
-    def action_handler(self):
-        while True:
-            action = p.recv_action(self.s)
-            if 'T' in action:
-                self.__addBlock(action['P'],action['T'])
-            else:
-                self.__removeBlock(action['P'])
-        self.s.close()
-
 
     ## @brief Creates the initial world state of the game (Generates random landforms).
     def GenerateWorld(self, initialPos):
@@ -144,13 +123,6 @@ class World(object):
             # Removes block if it wasn't delete from a position for some reason before overwriting
             if position in self.blockSet:
                 self.removeBlock(position, immediate)
-
-            # Send to server
-            if self.s:
-                # self.s.sendall(str(position).encode('utf-8'))
-                action = {'T':texture,'P':position}
-                p.send_action(action,self.s)
-
             self.blockSet[position] = ALL_BLOCKS[texture]
             self.sectors.setdefault(sectorize(position), []).append(position)
             if immediate:
@@ -162,9 +134,7 @@ class World(object):
             return
 
     # Adds a grass block at given position. Just a temporary test function
-    def __addBlock(self,position,texture,immediate=True):
-        # self.blockSet[position] = texture
-        position = tuple(position)
+    def serverAddBlock(self,position,texture,immediate=True):
         if position in self.blockSet:
             self.removeBlock(position, immediate)
         self.blockSet[position] = ALL_BLOCKS[texture]
@@ -180,10 +150,6 @@ class World(object):
     #                  is not provided)
     def removeBlock(self, position, immediate=True):
         del self.blockSet[position]
-        if self.s:
-            action = {'P':position}
-            p.send_action(action,self.s)
-
         self.sectors[sectorize(position)].remove(position)
         if immediate:
             if position in self.shownBlocks:
@@ -191,7 +157,7 @@ class World(object):
             self.checkSurrounding(position)
 
 
-    def __removeBlock(self, position, immediate=True):
+    def serverRemoveBlock(self, position, immediate=True):
         position = tuple(position)
         del self.blockSet[position]
         self.sectors[sectorize(position)].remove(position)

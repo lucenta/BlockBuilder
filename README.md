@@ -12,8 +12,10 @@ To join a server:
 ```
 python3 main.py -m <ip> <port>
 ```
-To start a server:
+
+To start your own server:
 ```
-python3 main.py -m <port>
+python3 server.py <port>
 ```
+
 

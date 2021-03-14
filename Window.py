@@ -8,14 +8,18 @@ from Block import *
 from pyglet.window import key, mouse
 import math
 
+
+import protocols as p
+
 ## @brief Inherited window object from pyglet library. Creates the window that displays BlockBuilder as well as defines game mechanics
 class Window(pyglet.window.Window):
 
     def __init__(self, server=None, *args, **kwargs):
         if server:
             self.s = server
-            # If a multiplayer game was started, connect to server
-            print("connecting to server",self.s)
+            threading.Thread(target=self.server_handler).start() # Create thread to handle incoming messages from server
+        else:
+            self.s = None
 
         super().__init__(*args, **kwargs)
         self.exclusive = True       # Whether or not the window exclusively captures the mouse.
@@ -41,6 +45,34 @@ class Window(pyglet.window.Window):
             color=(0, 0, 0, 255))
         
         pyglet.clock.schedule_interval(self.update, 1.0 / Constants.TICKS_PER_SEC)  # Schedules the `update()` method to be called, and the frequency to be called.
+
+        self.openGLsetup()
+
+    # Seperate thread to get actions from other users on the server
+    def server_handler(self):
+        while True:
+            action = p.recv_action(self.s)
+            if 'T' in action:
+                self.World.serverAddBlock(tuple(action['P']),action['T'])
+            else:
+                self.World.serverRemoveBlock(action['P'])
+        self.s.close()
+
+
+    def openGLsetup(self):
+        glClearColor(0.5, 0.7, 1.0, 1)                      # Set the sky color
+
+        glEnable(GL_DEPTH_TEST)                             # Basic OpenGL setup
+        glEnable(GL_CULL_FACE)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+
+        glEnable(GL_FOG)                                    # Create fog
+        glFogfv(GL_FOG_COLOR, (GLfloat * 4)(0.5, 0.69, 1.0, 1))
+        glHint(GL_FOG_HINT, GL_DONT_CARE)
+        glFogi(GL_FOG_MODE, GL_LINEAR)
+        glFogf(GL_FOG_START, 20.0)
+        glFogf(GL_FOG_END, 60.0)
 
 
     ## @brief Determines if the mouse is exclusive to the pyglet window.
@@ -158,10 +190,16 @@ class Window(pyglet.window.Window):
             block, previous = self.World.hitTest(self.position, vector, Constants.MAX_DISTANCE)
             if (button == mouse.RIGHT):
                 if previous:
+                    if self.s:
+                        action = {'T':self.block,'P':previous}
+                        p.send_action(action,self.s)
                     self.World.addBlock(previous,self.position,self.block)
             elif button == mouse.LEFT and block:
                 texture = self.World.blockSet[block]
                 if texture != STONE:
+                    action = {'P':block}
+                    if self.s:
+                        p.send_action(action,self.s)
                     self.World.removeBlock(block)
         else:
             self.setExclusiveMouse(True)
