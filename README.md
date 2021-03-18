@@ -37,4 +37,4 @@ How to Play:
 - An inventory system
 - A method of saving the game state
 - The ability to see player positions on the server
-- Refactor the server. The server is currently only being used to send information to clients when a client performs an action. If client A starts a server, modifies the world, and then client B joins the server, client B will not see the changes made by client A. In addition, if a client leaves and then joins a server, the world will be reset on Client B's end. I would want the server to be refactored such that world state can be saved on the server or retrieved from the host when requested.
+- Refactor the server. The server is currently only being used to send information to clients when a client performs an action. If client A starts a server, modifies the world, and then client B joins the server, client B will not see the changes made by client A. In addition, if a client leaves and then joins a server, the world will be reset on their end but not other clients. I would want the server to be refactored such that world state can be saved on the server or retrieved from the host when requested.
