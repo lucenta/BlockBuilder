@@ -29,3 +29,7 @@ HOW TO PLAY:
 | Left-Click | Remove block | 
 | Right-Click | Place block |
 | Keys 1-5 | Change block type (note that stone blocks can't be destroyed) |
+
+
+## Changes that I would like to see incorporated
+
