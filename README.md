@@ -4,7 +4,7 @@
 
 BlockBuilder is an improved, modularized version of [Fogleman's Python/Pyglet Minecraft](https://github.com/fogleman/Minecraft) with multiplayer capabilities.
 
-The pyglet library must be installed into order to run. Use pip to install pyglet.
+The pyglet library must be installed into order to run
 
 To run in single player (offline mode):
 ```
